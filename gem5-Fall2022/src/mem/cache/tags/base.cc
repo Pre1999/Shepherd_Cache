@@ -44,6 +44,7 @@
  */
 
 #include "mem/cache/tags/base.hh"
+#include "mem/cache/nvc.hh"
 
 #include <cassert>
 
@@ -70,17 +71,24 @@ BaseTags::BaseTags(const Params &p)
     registerExitCallback([this]() { cleanupRefs(); });
 }
 
+
+
+uint8_t nvc[2048][4];
 ReplaceableEntry*
 BaseTags::findBlockBySetAndWay(int set, int way) const
 {
     return indexingPolicy->getEntry(set, way);
 }
 
+/*Shepherd Cache Change*/
+/*We will get the way herre from getway of the blk and if cache hit in MC/SC we have to check corresponding SC CM entries are active then check the CM entry if it is empty or not, if yes then update otherwise leave it as it is */
+
 CacheBlk*
 BaseTags::findBlock(Addr addr, bool is_secure) const
 {
     // Extract block tag
     Addr tag = extractTag(addr);
+    int set;
 
     // Find possible entries that may contain the given address
     const std::vector<ReplaceableEntry*> entries =
@@ -90,6 +98,15 @@ BaseTags::findBlock(Addr addr, bool is_secure) const
     for (const auto& location : entries) {
         CacheBlk* blk = static_cast<CacheBlk*>(location);
         if (blk->matchTag(tag, is_secure)) {
+	    set = blk->getSet();
+	    for(int i = 0;i<4;i++){
+		if(entries[i]->used == 1){
+	    		blk->CM_entry[i] = nvc[set][i];
+			if(nvc[set][i] <= 15)
+			nvc[set][i] = nvc[set][i] + 1;
+		}
+			
+	    }
             return blk;
         }
     }

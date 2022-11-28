@@ -155,6 +155,7 @@ class BaseSetAssoc : public BaseTags
         return blk;
     }
 
+
     /**
      * Find replacement victim based on address. The list of evicted blocks
      * only contains the victim.
@@ -165,6 +166,19 @@ class BaseSetAssoc : public BaseTags
      * @param evict_blks Cache blocks to be evicted.
      * @return Cache block to be replaced.
      */
+
+    /*Shepherd Cache Change */
+    /* 1.) Reset if SC entry is there.
+ *     2a.) Initially cache miss happens, we need to make sure, first MC will be sent as the victim and when it is filled fully then only SCs will be sent.
+ *     2b.) If SCs are sent, we need to reset the Count Matrix column corresponding to that SC.
+ *     3.) If Cache miss afterwards, then we have to replace the oldest SC with the optimal MC blk or itself based on Shepherd cache implementation and then update the Count Matrix accordingly
+ *     4.) So we need to create a new Shepherd Cache replacment policy file which needs to do the following:
+ *     a.) Send MCs first and then only SCs when MCs are all filled.
+ *     b.) If MCs are filled, then SCs will be send and Count Matrix Column will be reset
+ *     c.) If all are filled, in the new replacement policy file, we will check the count matrix column corresponding to the oldest SC to be replaced and find the max value entry and send that as the victim.
+ *     d.) In this we need to be careful about the replaceable entry which will be discarded, we need to see how it is updating the memory for memory consistency and correct value in the memory. We just need to be sure if this is already happening.
+ *     */
+
     CacheBlk* findVictim(Addr addr, const bool is_secure,
                          const std::size_t size,
                          std::vector<CacheBlk*>& evict_blks) override

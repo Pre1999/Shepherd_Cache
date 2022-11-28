@@ -83,6 +83,12 @@ class ReplaceableEntry
      */
     std::shared_ptr<replacement_policy::ReplacementData> replacementData;
 
+
+    uint8_t SC_ptr;
+    bool SC_flag;
+    
+    uint8_t CM_entry[4];
+    bool used = 0;
     /**
      * Set both the set and way. Should be called only once.
      *
