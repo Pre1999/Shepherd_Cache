@@ -74,6 +74,7 @@ Cache::Cache(const CacheParams &p)
     assert(p.replacement_policy);
 }
 
+
 void
 Cache::satisfyRequest(PacketPtr pkt, CacheBlk *blk,
                       bool deferred_response, bool pending_downgrade)
