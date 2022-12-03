@@ -26,13 +26,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "mem/cache/replacement_policies/lru_rp.hh"
+#include "mem/cache/replacement_policies/sc_rp.hh"
 #include "mem/cache/nvc.hh"
 
 #include <cassert>
 #include <memory>
 
-#include "params/LRURP.hh"
+#include "params/SCRP.hh"
 #include "sim/cur_tick.hh"
 
 namespace gem5
@@ -96,7 +96,7 @@ SC::getVictim(const ReplacementCandidates& candidates) const
 		victim = candidates[i];
  		candidates[i]->used = 1;
 		candidates[i]->SC_flag = 0;
-		candidates[i]->SC_pntr = 0;
+		candidates[i]->SC_ptr = 0;
 		return victim;
 	}
       } 
@@ -106,7 +106,7 @@ SC::getVictim(const ReplacementCandidates& candidates) const
 	 	victim = candidates[i];
  		candidates[i]->used = 1;
 		candidates[i]->SC_flag = 1;
-		candidates[i]->SC_pntr = i;
+		candidates[i]->SC_ptr = i;
 		for(int j = 0; j<16;j++){
 			candidates[j]-> CM_entry[i] = 20; // To signify empty flag in CM entry
 		}

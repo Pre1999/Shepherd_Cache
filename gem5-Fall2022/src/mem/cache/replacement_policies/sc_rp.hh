@@ -54,11 +54,13 @@ class SC : public Base
     {
         /** Tick on which the entry was last touched. */
         Tick lastTouchTick;
+        Tick tickInserted;
 
         /**
          * Default constructor. Invalidate data.
          */
         SCReplData() : lastTouchTick(0) {}
+        // SCReplData() : tickInserted(0) {}
     };
 
   public:
