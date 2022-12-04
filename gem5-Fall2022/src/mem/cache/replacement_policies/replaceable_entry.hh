@@ -86,9 +86,9 @@ class ReplaceableEntry
 
     uint8_t SC_ptr;
     bool SC_flag;
-    
-    uint8_t CM_entry[4];
     bool used = 0;
+    uint8_t CM_entry[2];
+
     /**
      * Set both the set and way. Should be called only once.
      *

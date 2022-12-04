@@ -42,7 +42,7 @@ GEM5_DEPRECATED_NAMESPACE(ReplacementPolicy, replacement_policy);
 namespace replacement_policy
 {
 
-uint8_t nvc[2048][4];
+uint8_t nvc[1000000][2];
 
 SC::SC(const Params &p)
   : Base(p)
@@ -84,24 +84,33 @@ SC::getVictim(const ReplacementCandidates& candidates) const
     assert(candidates.size() > 0);
 
     // Visit all candidates to find victim
-    ReplaceableEntry* victim = candidates[4];
+    ReplaceableEntry* victim = candidates[2];
     ReplaceableEntry* temp_victim = candidates[0];
     ReplaceableEntry* temp_sc = candidates[0]; 
     int temp_index,temp_index_loop,temp_way,temp_cm;
-    int set;
+    uint32_t set_sc;
+    temp_index = 0;
+    temp_index_loop = 0;
+    temp_way = 0;
+    temp_cm = 0;
+    set_sc = 0;
     //for (const auto& candidate : candidates) 
         // Update victim entry if necessary
-       for(int i=4;i<16;i++){
+       for(int i=2;i<16;i++){
          if(candidates[i]->used == 0){
 		victim = candidates[i];
  		candidates[i]->used = 1;
 		candidates[i]->SC_flag = 0;
 		candidates[i]->SC_ptr = 0;
+		for(int j = 0; j<16;j++){
+			candidates[j]-> CM_entry[0] = 20; // To signify empty flag in CM entry
+			candidates[j]-> CM_entry[1] = 20; // To signify empty flag in CM entry
+		}
 		return victim;
 	}
       } 
    // It means all MC are filled. Going to SCs.
-      for(int i=0;i<3;i++){
+      for(int i=0;i<2;i++){
          if(candidates[i]->used == 0){
 	 	victim = candidates[i];
  		candidates[i]->used = 1;
@@ -110,13 +119,13 @@ SC::getVictim(const ReplacementCandidates& candidates) const
 		for(int j = 0; j<16;j++){
 			candidates[j]-> CM_entry[i] = 20; // To signify empty flag in CM entry
 		}
-		set  = victim->getSet();
-		nvc[set][i] = 0;
+		set_sc  = victim->getSet();
+		nvc[set_sc][i] = 0;
 		return victim;
 	 } 
       }
      // This means that SCs are also filled already
-        for(int i=0;i<3;i++){
+       for(int i=0;i<2;i++){
         	if (std::static_pointer_cast<SCReplData>(
                     candidates[i]->replacementData)->tickInserted <
                     std::static_pointer_cast<SCReplData>(
@@ -125,14 +134,14 @@ SC::getVictim(const ReplacementCandidates& candidates) const
 		temp_way = i;
 		}
 	}
-		set  = temp_sc->getSet();
-		nvc[set][temp_way] = 0;
+		set_sc  = temp_sc->getSet();
+		nvc[set_sc][temp_way] = 0;
 		temp_victim = temp_sc;
 		if(temp_sc->CM_entry[temp_way] == 20)
 			temp_cm = 0;
 		else
 			temp_cm = temp_sc->CM_entry[temp_way];
-		for(int j = 4; j<16;j++){
+		for(int j = 2; j<16;j++){
 			if(candidates[j]->CM_entry[temp_way] != 20){
 			  if(candidates[j]->CM_entry[temp_way] > temp_cm){
 				temp_cm = candidates[j]->CM_entry[temp_way];
@@ -147,7 +156,7 @@ SC::getVictim(const ReplacementCandidates& candidates) const
 			temp_index = temp_way;
 	
 	if(temp_index != temp_way){	
-        	for(int i=0;i<3;i++){
+        	for(int i=0;i<2;i++){
 			candidates[temp_index]->CM_entry[i] = temp_sc->CM_entry[i];
 			temp_sc->CM_entry[i] = 0;
 		}
@@ -157,10 +166,10 @@ SC::getVictim(const ReplacementCandidates& candidates) const
 		candidates[j]-> CM_entry[temp_way] = 20; // To signify empty flag in CM entry
 	}
 	victim = temp_sc;
+
 	return victim;	
 
-
-    return victim;
+   // return victim;
 }
 
 std::shared_ptr<ReplacementData>

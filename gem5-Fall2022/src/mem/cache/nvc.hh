@@ -1,1 +1,1 @@
-extern uint8_t nvc[2048][4];
+extern uint8_t nvc[1000000][2];
