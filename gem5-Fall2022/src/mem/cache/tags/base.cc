@@ -73,7 +73,7 @@ BaseTags::BaseTags(const Params &p)
 
 
 
-uint8_t nvc[2048][2];
+// uint8_t nvc[2048][2];
 ReplaceableEntry*
 BaseTags::findBlockBySetAndWay(int set, int way) const
 {
@@ -88,7 +88,6 @@ BaseTags::findBlock(Addr addr, bool is_secure) const
 {
     // Extract block tag
     Addr tag = extractTag(addr);
-    uint32_t set_sc = 0;
 
     // Find possible entries that may contain the given address
     const std::vector<ReplaceableEntry*> entries =
@@ -98,31 +97,6 @@ BaseTags::findBlock(Addr addr, bool is_secure) const
     for (const auto& location : entries) {
         CacheBlk* blk = static_cast<CacheBlk*>(location);
         if (blk->matchTag(tag, is_secure)) {
-	    set_sc = blk->getSet();
-
-/*	    if(entries[0]->used == 1){
-	    	blk->CM_entry[0] = nvc[set_sc][0];
-		if(nvc[set_sc][0] <= 15)
-			nvc[set_sc][0] = nvc[set_sc][0] + 1;
-	    }
-	    if(entries[1]->used == 1){
-	    	blk->CM_entry[1] = nvc[set_sc][1];
-		if(nvc[set_sc][1] <= 15)
-			nvc[set_sc][1] = nvc[set_sc][1] + 1;
-	    }
-	    if(entries[2]->used == 1)
-	    //	int temp_1 = 1;
-		blk->CM_entry[2] = 0;//nvc[set_sc][i];
-	    if(entries[3]->used == 1)
-	    	blk->CM_entry[3] = 0;//nvc[set_sc][i];*/
-	    for(uint32_t i = 0;i<2;i++){
-		if(entries[i]->used == 1){
-	    		blk->CM_entry[i] = nvc[set_sc][i];
-			if(nvc[set_sc][i] <= 15)
-				nvc[set_sc][i] = nvc[set_sc][i] + 1;
-		}
-			
-	    }
             return blk;
         }
     }
