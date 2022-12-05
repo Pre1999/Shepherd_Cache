@@ -80,6 +80,12 @@ class ListRP(argparse.Action):
         sys.exit(0)
 
 
+class ListTags(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        ObjectList.tags_list.print()
+        sys.exit(0)
+
+
 class ListIndirectBP(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         ObjectList.indirect_bp_list.print()
@@ -160,6 +166,10 @@ def addNoISAOptions(parser):
     parser.add_argument("--l2_repl", type=str, default="LRURP",
                       choices=ObjectList.rp_list.get_names(),
                       help = "replacement policy for l2")
+    
+    parser.add_argument("--l2_tags", type=str, default="BaseSetAssoc",
+                      choices=ObjectList.tags_list.get_names(),
+                      help = "Tags for l2")
 
     # Enable Ruby
     parser.add_argument("--ruby", action="store_true")
