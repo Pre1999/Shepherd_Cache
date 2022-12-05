@@ -123,7 +123,8 @@ def config_cache(options, system):
         system.l2 = l2_cache_class(clk_domain=system.cpu_clk_domain,
                            size=options.l2_size,
                            assoc=options.l2_assoc,
-                           replacement_policy=ObjectList.rp_list.get(options.l2_repl)())
+                           replacement_policy=ObjectList.rp_list.get(options.l2_repl)(),
+                           tags=ObjectList.tags_list.get(options.l2_index_policy)())
 
         system.tol2bus = L2XBar(clk_domain = system.cpu_clk_domain)
         system.l2.cpu_side = system.tol2bus.mem_side_ports
