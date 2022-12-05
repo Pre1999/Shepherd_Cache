@@ -85,7 +85,6 @@ class ListTags(argparse.Action):
         ObjectList.tags_list.print()
         sys.exit(0)
 
-
 class ListIndirectBP(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         ObjectList.indirect_bp_list.print()

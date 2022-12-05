@@ -73,7 +73,7 @@ BaseTags::BaseTags(const Params &p)
 
 
 
-uint8_t nvc[1000000][2];
+uint8_t nvc[2048][2];
 ReplaceableEntry*
 BaseTags::findBlockBySetAndWay(int set, int way) const
 {

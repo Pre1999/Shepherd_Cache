@@ -59,6 +59,12 @@ SetAssociative::SetAssociative(const Params &p)
 uint32_t
 SetAssociative::extractSet(const Addr addr) const
 {
+    // static int value;
+    // std::cout<<"Printing Set Shift: "<<setShift<<"\n";
+    // std::cout<<"Printing addr: "<<addr<<"\n";
+    // std::cout<<"Printing Set Mask: "<<setMask<<"\n";
+    // value = (addr >> setShift) & setMask;
+    // std::cout<<"Printing Return Val: "<<value<<"\n";
     return (addr >> setShift) & setMask;
 }
 
@@ -72,6 +78,14 @@ SetAssociative::regenerateAddr(const Addr tag, const ReplaceableEntry* entry)
 std::vector<ReplaceableEntry*>
 SetAssociative::getPossibleEntries(const Addr addr) const
 {
+    // static int count = 0;
+    // if(count<1000)
+    // {
+    //     std::cout<<"Number of Sets: "<<numSets<<"\n";
+    //     std::cout<<"Number of Ways: "<<sets[extractSet(addr)].size()<<"\n";
+    //     std::cout<<"Assoc: "<<assoc<<"\n";
+    // }
+    // count = count + 1;
     return sets[extractSet(addr)];
 }
 
