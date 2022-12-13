@@ -52,7 +52,7 @@
 namespace gem5
 {
 
-uint8_t nvc[2048][4];
+
 
 SCSetAssoc::SCSetAssoc(const Params &p)
     :BaseTags(p), allocAssoc(p.assoc), blks(p.size / p.block_size),
@@ -84,6 +84,18 @@ SCSetAssoc::tagsInit()
 
         // Associate a replacement data entry to the block
         blk->replacementData = replacementPolicy->instantiateEntry();
+        
+        // Initializing the Shepherd Cache and Main Cache
+        if(blk->getWay() < 4)
+        {
+            blk->SC_flag = 1;
+            blk->SC_ptr = blk->getWay();
+        }
+        else
+        {
+            blk->SC_flag = 0;
+            blk->SC_ptr = blk->getWay();
+        }
     }
 }
 
@@ -117,6 +129,7 @@ SCSetAssoc::findBlock(Addr addr, bool is_secure) const
     // Extract block tag
     Addr tag = extractTag(addr);
     uint32_t set_sc = 0;
+    static int print_var, temp_var;
 
     // Find possible entries that may contain the given address
     const std::vector<ReplaceableEntry*> entries =
@@ -135,9 +148,105 @@ SCSetAssoc::findBlock(Addr addr, bool is_secure) const
             {
                 if(entries[i]->used == 1)
                 {
-                    blk->CM_entry[i] = nvc[set_sc][i];
-                    if(nvc[set_sc][i] <= 15)
-                        nvc[set_sc][i] = nvc[set_sc][i] + 1;
+                    temp_var = blk->nvc[i];
+                    blk->CM_entry[i] = temp_var;
+                    // std::cout<<"-> Block NVC: "<<temp_var<<"\n";
+                    print_var = blk->CM_entry[i];
+                    // std::cout<<"-> Block CM Entry: "<<print_var<<"\n";
+                    if(blk->nvc[i] <= 15)
+                    {
+                        print_var = blk->nvc[i];
+                        blk->nvc[i] = print_var + 1;
+                        for(int k=0; k<16; k++)
+                        {
+                            temp_var = blk->nvc[i];
+                            entries[k]->nvc[i] = temp_var;
+                        }
+                    }
+                }
+            }
+
+            // std::cout<<"-> Block Set Number: "<<set_sc<<"\n";
+            
+            // std::cout<<"-> Entries Used: \n";
+            // for(int k=0; k<16; k++)
+            // {
+            //     print_var = entries[k]->used; 
+            //     std::cout<<print_var<<" ";
+            // }
+            // std::cout<<"\n";
+
+            // std::cout<<"-> SC Entries: \n";
+            // for(int k=0; k<16; k++)
+            // {
+            //     print_var = entries[k]->SC_flag;
+            //     std::cout<<print_var<<" ";
+            // }
+            // std::cout<<"\n";   
+
+            // std::cout<<"-> NVC Vals: \n";
+            // for(int k=0; k<4; k++)
+            // {
+            //     print_var = blk->nvc[k];
+            //     std::cout<<print_var<<" ";
+            // }
+            // std::cout<<"\n";        
+
+            // std::cout<<"-> Blk Count Matrix: \n";
+            // for(int k=0; k<4; k++)
+            // {
+            //     print_var = blk->CM_entry[k]; 
+            //     std::cout<<print_var<<" ";
+            // }
+            // std::cout<<"\n";        
+
+            // std::cout<<"-> Entries Count Matrix: \n";
+            // for(int i=0; i<16; i++)
+            // {
+            //     for(int k=0; k<4; k++)
+            //     {
+            //         temp_var = entries[i]->CM_entry[k]; 
+            //         std::cout<<temp_var<<" ";
+            //     }
+            //     std::cout<<"\n";
+            // }
+            // std::cout<<"\n";
+
+            return blk;
+        }
+    }
+
+    // Did not find block
+    return nullptr;
+}
+
+/*CacheBlk*
+SCSetAssoc::findBlock(Addr addr, bool is_secure) const
+{
+    // Extract block tag
+    Addr tag = extractTag(addr);
+    uint32_t set_sc = 0;
+
+    // Find possible entries that may contain the given address
+    const std::vector<ReplaceableEntry*> entries =
+        indexingPolicy->getPossibleEntries(addr);
+
+    // std::cout<<"--> Number of Ways: "<<entries.size()<<"\n";         -- Verified : Ways = 16
+
+    // Search for block
+    for (const auto& location : entries) 
+    {
+        CacheBlk* blk = static_cast<CacheBlk*>(location);
+        if (blk->matchTag(tag, is_secure)) 
+        {
+            set_sc = blk->getSet();
+            for(uint32_t i = 0; i<16; i++)
+            {
+                if(entries[i]->SC_flag == 1 && entries[i]->used == 1)
+                {
+                    blk->CM_entry[entries[i]->SC_ptr] = nvc[set_sc][entries[i]->SC_ptr];
+                    if(nvc[set_sc][entries[i]->SC_ptr] <= 15)
+                        nvc[set_sc][entries[i]->SC_ptr] = nvc[set_sc][entries[i]->SC_ptr] + 1;
                 }
             }
             return blk;
@@ -146,6 +255,6 @@ SCSetAssoc::findBlock(Addr addr, bool is_secure) const
 
     // Did not find block
     return nullptr;
-}
+}*/
 
 } // namespace gem5
